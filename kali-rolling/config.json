@@ -1,0 +1,56 @@
+{
+  "variables": {
+      "iso_url": "https://cdimage.kali.org/kali-2023.4/kali-linux-2023.4-installer-amd64.iso",
+      "iso_checksum": "49f6826e302659378ff0b18eda28121dad7eeab4da3b8d171df034da4996a75e"
+  },
+  "builders": [
+    {
+      "type": "qemu",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "sha256:{{user `iso_checksum`}}",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_timeout": "100m",
+      "cpus": "6",
+      "memory": "2048",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "http_directory": "http",
+      "net_device": "virtio-net",
+      "format": "qcow2",
+      "accelerator": "tcg",
+      "disk_interface": "virtio-scsi",
+      "disk_discard": "unmap",
+      "disk_detect_zeroes": "unmap",
+      "disk_cache": "unsafe",
+      "disk_image": false,
+      "disk_compression": true,
+      "boot_command": [
+        "<esc><wait>",
+        "install <wait>",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "locale=en_US ",
+        "keymap=us ",
+        "hostname=kali ",
+        "domain='' ",
+        "<enter>"
+      ]
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S bash -euxo pipefail '{{.Path}}'",
+      "scripts": [
+        "scripts/vagrant.sh",
+        "scripts/minimize.sh"
+      ]
+    }
+  ],
+  "post-processors": [
+    [
+      {
+        "type": "vagrant",
+        "vagrantfile_template": "Vagrantfile.tpl"
+      }
+    ]
+  ]
+}
