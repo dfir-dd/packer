@@ -7,12 +7,12 @@
 packer {
   required_plugins {
     qemu = {
-      version = "~> 1"
-      source  = "github.com/hashicorp/qemu"
+        version = "~> 1"
+        source  = "github.com/hashicorp/qemu"
     }
 	vagrant = {
-      version = "~> 1"
-      source = "github.com/hashicorp/vagrant"
+        version = "~> 1"
+        source = "github.com/hashicorp/vagrant"
     }
   }
 }
@@ -28,6 +28,19 @@ variable "iso_checksum" {
     default = "c150608cad5f8ec71608d0713d487a563d9b916a0199b1414b6ba09fce788ced"
 }
 
+variable "vagrant_cloud_box" {
+    type = string
+    default = "dfir-dd/kali-rolling"
+}
+# You have to set this in your creds.pkr.hcl
+variable "vagrant_cloud_version" {
+    type = string
+}
+# You have to set this in your creds.pkr.hcl
+variable "vagrant_cloud_token" {
+    type = string
+}
+
 # Resource Definition for the VM Template
 source "qemu" "Kali2024" {
     
@@ -38,10 +51,6 @@ source "qemu" "Kali2024" {
     sockets = "1"
 
     # VM OS Settings
-    # (Option 1) Local ISO File
-    #iso_file = "local:iso/kali-linux-2024.1-installer-amd64.iso"
-    # - or -
-    # (Option 2) Download ISO
     iso_url = "${var.iso_url}"
     iso_checksum = "${var.iso_checksum}"
 
@@ -56,11 +65,11 @@ source "qemu" "Kali2024" {
     disk_compression  = true
     
     # Qemu Settings
-#    qemuargs = [ 	
-#    	["-machine", "type=q35,accel=kvm:whpx:tcg"],
-#    ]
+    qemuargs = [ 	
+    	["-machine", "type=q35,accel=kvm:whpx:tcg"],
+    ]
     
-    accelerator = "kvm"
+    # accelerator = "kvm"
     
     net_device = "virtio-net"
 
@@ -73,7 +82,7 @@ source "qemu" "Kali2024" {
         "install <wait>",
         "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
         "locale=en_US ",
-        "keymap=de ",
+        "keymap=us ",
         "hostname=kali ",
         "domain='' ",
         "<enter>"
@@ -92,7 +101,7 @@ source "qemu" "Kali2024" {
     # Raise the timeout, when installation takes longer
     ssh_timeout = "60m"
     
-    shutdown_command  = "echo 'vagrant2' | sudo -S shutdown -P now"
+    shutdown_command  = "echo 'vagrant' | sudo -S shutdown -P now"
 } 
 
 # Build Definition to create the VM Template
@@ -100,16 +109,33 @@ build {
     name = "Kali2024"
     sources = ["source.qemu.Kali2024"]
     
+    provisioner "file" {
+        source = "files/hayabusa-wrapper.sh"
+        destination = "/tmp/hayabusa-wrapper.sh"
+    }
+
     provisioner "shell" {
     	execute_command = "echo 'vagrant' | {{.Vars}} sudo -S bash -euxo pipefail '{{.Path}}'"
     	scripts = [ 
-    	    "scripts/vagrant.sh",
-    	    "scripts/minimize.sh"
+            "scripts/rust.sh",
+            "scripts/regripper.sh",
+            "scripts/dissect.sh",
+            "scripts/ewftools.sh",
+            "scripts/hayabusa.sh",
+            "scripts/vagrant.sh",
+            "scripts/minimize.sh"
     	]
     }
     
     post-processor "vagrant" {
         vagrantfile_template = "Vagrantfile.tpl"
     }
+
+    # post-processor "vagrant-cloud" {
+    #     box_tag = "${var.vagrant_cloud_box}"",
+    #     access_token = "${var.vagrant_cloud_token}"
+    #     version =: "${var.vagrant_cloud_version}"
+    # }
+
 }
 
