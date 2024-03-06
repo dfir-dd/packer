@@ -1,7 +1,0 @@
-Original from: https://gitlab.com/kalilinux/build-scripts/kali-vagrant/-/tree/master?ref_type=heads
-
-Edited files: 
-- config.json > removed vars and builders except qemu
-- http/preseed.cfg > switched desktop env to GNOME and keyboard layouts to de
-- README > to keep up to date with changes
-- added packer.config
