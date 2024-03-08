@@ -117,6 +117,7 @@ build {
     provisioner "shell" {
     	execute_command = "echo 'vagrant' | {{.Vars}} sudo -S bash -euxo pipefail '{{.Path}}'"
     	scripts = [ 
+    	    "scripts/base-tools.sh",
             "scripts/rust.sh",
             "scripts/regripper.sh",
             "scripts/dissect.sh",
@@ -126,16 +127,19 @@ build {
             "scripts/minimize.sh"
     	]
     }
-    
-    post-processor "vagrant" {
-        vagrantfile_template = "Vagrantfile.tpl"
-    }
 
-    # post-processor "vagrant-cloud" {
-    #     box_tag = "${var.vagrant_cloud_box}"",
-    #     access_token = "${var.vagrant_cloud_token}"
-    #     version =: "${var.vagrant_cloud_version}"
-    # }
+    post-processors {
+        post-processor "vagrant" {
+            vagrantfile_template = "Vagrantfile.tpl"
+        }
 
+        post-processor "vagrant-cloud" {
+            box_tag = "${var.vagrant_cloud_box}"
+            access_token = "${var.vagrant_cloud_token}"
+            version = "${var.vagrant_cloud_version}"
+            no_release = "true"
+        }
+        
+    } 
 }
 
