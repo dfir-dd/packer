@@ -14,6 +14,10 @@ packer {
         version = "~> 1"
         source = "github.com/hashicorp/vagrant"
     }
+    vmware = {
+        version = "~>1"
+        source = "github.com/hashicorp/vmware"
+    }
   }
 }
 
@@ -104,10 +108,58 @@ source "qemu" "Kali2024" {
     shutdown_command  = "echo 'vagrant' | sudo -S shutdown -P now"
 } 
 
+
+source "vmware-iso" "Kali2024" {
+    
+    # VM General Settings
+    vm_name = "Kali"
+    memory = "8192" 
+    cores = "8"
+
+    # VM OS Settings
+    guest_os_type = "debian11-64"
+    iso_url = "${var.iso_url}"
+    iso_checksum = "${var.iso_checksum}"
+    
+    network = "nat"
+    network_adapter_type = "vmxnet3"
+
+
+    # PACKER Autoinstall Settings
+    http_directory = "http" 
+    
+    # PACKER Boot Commands
+    boot_command = [
+        "<esc><wait>",
+        "install <wait>",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "locale=en_US ",
+        "keymap=us ",
+        "hostname=kali ",
+        "domain='' ",
+        "<enter>"
+      ]
+    boot_wait = "5s"
+
+    # SSH Settings
+    ssh_username = "vagrant"
+    
+    # (Option 1) Add your Password here
+    ssh_password = "vagrant"
+    # - or -
+    # (Option 2) Add your Private SSH KEY file here
+    #ssh_private_key_file = "~/.ssh/tempkey_ed"
+
+    # Raise the timeout, when installation takes longer
+    ssh_timeout = "60m"
+    
+    shutdown_command  = "echo 'vagrant' | sudo -S shutdown -P now"
+} 
+
 # Build Definition to create the VM Template
 build {
     name = "Kali2024"
-    sources = ["source.qemu.Kali2024"]
+    sources = ["source.vmware-iso.Kali2024"]
     
     provisioner "file" {
         source = "files/hayabusa-wrapper.sh"
