@@ -46,7 +46,7 @@ variable "vagrant_cloud_token" {
 }
 
 # Resource Definition for the VM Template
-source "qemu" "Kali2024" {
+source "qemu" "qemu-Kali2024" {
     
     # VM General Settings
     vm_name = "Kali"
@@ -84,7 +84,7 @@ source "qemu" "Kali2024" {
     boot_command = [
         "<esc><wait>",
         "install <wait>",
-        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed_qemu.cfg ",
         "locale=en_US ",
         "keymap=us ",
         "hostname=kali ",
@@ -109,7 +109,7 @@ source "qemu" "Kali2024" {
 } 
 
 
-source "vmware-iso" "Kali2024" {
+source "vmware-iso" "VMWare-Kali2024" {
     
     # VM General Settings
     vm_name = "Kali"
@@ -117,13 +117,9 @@ source "vmware-iso" "Kali2024" {
     cores = "8"
 
     # VM OS Settings
-    guest_os_type = "debian11-64"
+    guest_os_type = "debian10-64"
     iso_url = "${var.iso_url}"
     iso_checksum = "${var.iso_checksum}"
-    
-    network = "nat"
-    network_adapter_type = "vmxnet3"
-
 
     # PACKER Autoinstall Settings
     http_directory = "http" 
@@ -132,7 +128,7 @@ source "vmware-iso" "Kali2024" {
     boot_command = [
         "<esc><wait>",
         "install <wait>",
-        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg ",
+        "preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed_vmware.cfg ",
         "locale=en_US ",
         "keymap=us ",
         "hostname=kali ",
@@ -159,7 +155,10 @@ source "vmware-iso" "Kali2024" {
 # Build Definition to create the VM Template
 build {
     name = "Kali2024"
-    sources = ["source.vmware-iso.Kali2024"]
+    sources = [
+        "source.vmware-iso.VMWare-Kali2024",
+        "source.qemu.qemu-Kali2024"
+        ]
     
     provisioner "file" {
         source = "files/hayabusa-wrapper.sh"
