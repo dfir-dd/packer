@@ -123,6 +123,8 @@ source "vmware-iso" "VMWare-Kali2024" {
 
     # PACKER Autoinstall Settings
     http_directory = "http" 
+
+    
     
     # PACKER Boot Commands
     boot_command = [
@@ -190,7 +192,5 @@ build {
             version = "${var.vagrant_cloud_version}"
             no_release = "true"
         }
-        
     } 
 }
-
