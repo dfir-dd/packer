@@ -24,17 +24,19 @@ packer {
 # Variable Definitions
 variable "iso_url" {
     type = string
-    default = "https://cdimage.kali.org/kali-2024.1/kali-linux-2024.1-installer-amd64.iso"
+    default = "https://cdimage.kali.org/kali-2024.3/kali-linux-2024.3-installer-amd64.iso"
+    #default = "https://cdimage.kali.org/kali-2024.2/kali-linux-2024.2-installer-amd64.iso"
 }
 
 variable "iso_checksum" {
     type = string
-    default = "c150608cad5f8ec71608d0713d487a563d9b916a0199b1414b6ba09fce788ced"
+    default = "2ba1abf570ea0685ca4a97dd9c83a65670ca93043ef951f0cd7bbff914fa724a"
+    #default = "5eb9dc96cccbdfe7610d3cbced1bd6ee89b5acdfc83ffee1f06e6d02b058390c"
 }
 
 variable "vagrant_cloud_box" {
     type = string
-    default = "dfir-dd/kali-rolling"
+    default = "dfir-dd/kali"
 }
 # You have to set this in your creds.pkr.hcl
 variable "vagrant_cloud_version" {
@@ -123,8 +125,6 @@ source "vmware-iso" "VMWare-Kali2024" {
 
     # PACKER Autoinstall Settings
     http_directory = "http" 
-
-    
     
     # PACKER Boot Commands
     boot_command = [

@@ -12,8 +12,8 @@ if [ ! -x /opt/cargo/bin/cargo ]; then
 fi
 
 # install some forensic tools
-cargo install dfir-toolkit ntdsextract2 xsv ripgrep stringsext mft2bodyfile mft2bodyfile usnjrnl regview ntdsextract2 bat broot
-#cargo install --features="feature_capable" qsv
+cargo install dfir-toolkit ntdsextract2 xsv ripgrep stringsext mft2bodyfile mft2bodyfile usnjrnl ntdsextract2 bat broot regview
+cargo install --features="feature_capable" qsv
 
 # generate autocompletes
 mkdir -p /usr/local/share/zsh/site-functions
