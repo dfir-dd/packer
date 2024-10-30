@@ -38,10 +38,17 @@ variable "vagrant_cloud_box" {
     type = string
     default = "dfir-dd/kali"
 }
+
 # You have to set this in your creds.pkr.hcl
 variable "vagrant_cloud_version" {
     type = string
 }
+
+# You have to set this in your creds.pkr.hcl
+variable "vagrant_cloud_id" {
+    type = string
+}
+
 # You have to set this in your creds.pkr.hcl
 variable "vagrant_cloud_token" {
     type = string
@@ -117,6 +124,7 @@ source "vmware-iso" "VMWare-Kali2024" {
     vm_name = "Kali"
     memory = "8192" 
     cores = "8"
+    network = "nat"
 
     # VM OS Settings
     guest_os_type = "debian10-64"
@@ -186,9 +194,10 @@ build {
             vagrantfile_template = "Vagrantfile.tpl"
         }
 
-        post-processor "vagrant-cloud" {
+        post-processor "vagrant-registry" {
             box_tag = "${var.vagrant_cloud_box}"
-            access_token = "${var.vagrant_cloud_token}"
+            client_id = "${var.vagrant_cloud_id}"
+            client_secret = "${var.vagrant_cloud_token}"
             version = "${var.vagrant_cloud_version}"
             no_release = "true"
         }
